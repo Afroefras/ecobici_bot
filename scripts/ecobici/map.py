@@ -53,8 +53,8 @@ class EcoBiciMap:
     def transform(self, station_cols: list=['id','zipCode','location.lat','location.lon'], id_col: str='id', status_col: str='status', bikes_col: str='availability.bikes', slots_col: str='availability.slots') -> None:
         self.df = self.st[station_cols].merge(self.av, on=id_col)
         self.df = self.df[self.df[status_col]=='OPN'].copy()
-        self.df['disponible'] = self.df[slots_col] / (self.df[slots_col] + self.df[bikes_col])
-        self.df['ocupado'] = 1 - self.df['disponible']
+        self.df['slots_proportion'] = self.df[slots_col] / (self.df[slots_col] + self.df[bikes_col])
+        self.df['bikes_proportion'] = 1 - self.df['slots_proportion']
 
 
     def set_custom_legend(self, ax, cmap, values: list) -> None:
@@ -76,7 +76,7 @@ class EcoBiciMap:
         self.gdf.plot(ax=ax, linewidth=0.5, **kwargs)
 
         cmap = get_cmap(points_palette)
-        scatterplot(y=lat_col, x=lon_col, hue='ocupado', data=self.df, ax=ax, palette=cmap)
+        scatterplot(y=lat_col, x=lon_col, hue='slots_proportion', data=self.df, ax=ax, palette=cmap)
 
         self.set_custom_legend(ax, cmap, values=[(0.0, 'Hay bicis'), (0.5, 'Puede haber'), (1.0, 'No hay bicis')])
         fig.savefig(self.base_dir.joinpath('media','map','map.png'))

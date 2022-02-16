@@ -1,0 +1,6 @@
+name: Get_map
+  env:
+      ECOBICI_KEY: ${{ secrets.ECOBICI_CLIENT_ID}}
+      ECOBICI_CLIENT_SECRET: ${{ secrets.ECOBICI_CLIENT_ID}}
+  run: |
+    run_getmap

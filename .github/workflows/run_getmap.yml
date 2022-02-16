@@ -15,6 +15,6 @@ jobs:
           ECOBICI_KEY: ${{ secrets.ECOBICI_CLIENT_ID}}
           ECOBICI_CLIENT_SECRET: ${{ secrets.ECOBICI_CLIENT_ID}}
         run: |
-          run_getmap
+          scripts/ecobici/run_getmap.py
 
 

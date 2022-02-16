@@ -1,6 +1,20 @@
-name: Get_map
-  env:
-      ECOBICI_KEY: ${{ secrets.ECOBICI_CLIENT_ID}}
-      ECOBICI_CLIENT_SECRET: ${{ secrets.ECOBICI_CLIENT_ID}}
-  run: |
-    run_getmap
+name: Ecobici bot
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  secrets-in-github-actions:
+    runs-on: windows-latest
+
+    steps:
+      # Use a GitHub Actions secret variable in a bash shell
+      - name: Get_map
+        env: 
+          ECOBICI_KEY: ${{ secrets.ECOBICI_CLIENT_ID}}
+          ECOBICI_CLIENT_SECRET: ${{ secrets.ECOBICI_CLIENT_ID}}
+        run: |
+          run_getmap
+
+

@@ -2,7 +2,7 @@ name: Ecobici bot
 
 on:
   schedule:
-    - cron: '0,30 * * * *' # runs every half hour
+    - cron: '* * * * *' # runs every half hour
 
 jobs:
   build:
@@ -25,8 +25,8 @@ jobs:
           
       - name: execute py script 
         env: 
-          ECOBICI_KEY: ${{ secrets.ECOBICI_CLIENT_ID }}
-          ECOBICI_CLIENT_SECRET: ${{ secrets.ECOBICI_CLIENT_ID }}
+          ECOBICI_CLIENT_ID: ${{ secrets.ECOBICI_CLIENT_ID }}
+          ECOBICI_CLIENT_SECRET: ${{ secrets.ECOBICI_CLIENT_SECRET }}
         run: python ./scripts/ecobici/run_getmap.py
 
       # - name: commit files

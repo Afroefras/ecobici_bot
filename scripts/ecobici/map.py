@@ -17,7 +17,7 @@ from matplotlib.pyplot import Axes, Figure, get_cmap
 
 class EcoBiciMap:
     def __init__(self, client_id: str, client_secret: str) -> None:
-        self.base_dir = Path().cwd().parent
+        self.base_dir = Path().cwd()
         self.base_url = "https://pubsbapi-latam.smartbike.com"
         self.user_credentials = f"oauth/v2/token?client_id={client_id}&client_secret={client_secret}"
     

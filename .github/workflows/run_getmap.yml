@@ -2,7 +2,7 @@ name: Ecobici bot
 
 on:
   schedule:
-    - cron: '0,30 * * * *' # runs every half hour
+    - cron: '0 * * * *' # runs every hour, more info at https://crontab.guru/
 
 jobs:
   build:
@@ -29,12 +29,16 @@ jobs:
           ECOBICI_CLIENT_SECRET: ${{ secrets.ECOBICI_CLIENT_SECRET }}
         run: python ./scripts/ecobici/run_getmap.py
 
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M')"
+
       - name: commit files
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git commit -m "update data" -a
+          git commit -m "Updated map at ${{ steps.date.outputs.date }}" -a
           
       - name: push changes
         uses: ad-m/github-push-action@v0.6.0

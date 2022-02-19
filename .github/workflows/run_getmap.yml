@@ -2,8 +2,7 @@ name: Ecobici bot
 
 on:
   schedule:
-    # - cron: '0,30 0-23 * * *' 
-    - cron: '* * * * *' 
+    - cron: '0,30 * * * *' # runs every half hour
 
 jobs:
   build:
@@ -17,7 +16,7 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.9.1' # install the python version needed
+          python-version: '3.9.1'
           
       - name: install python packages
         run: |
@@ -29,16 +28,16 @@ jobs:
           ECOBICI_KEY: ${{ secrets.ECOBICI_CLIENT_ID }}
           ECOBICI_CLIENT_SECRET: ${{ secrets.ECOBICI_CLIENT_ID }}
         run: python ./scripts/ecobici/run_getmap.py
+
+      # - name: commit files
+      #   run: |
+      #     git config --local user.email "action@github.com"
+      #     git config --local user.name "GitHub Action"
+      #     git add -A
+      #     git commit -m "update data" -a
           
-      - name: commit files
-        run: |
-          git config --global user.name 'Afroefras'
-          git config --global user.email 'Afroefras@users.noreply.github.com'
-          git commit -am "Automated report"
-          git push
-          
-      - name: push changes
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+      # - name: push changes
+      #   uses: ad-m/github-push-action@v0.6.0
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     branch: main  

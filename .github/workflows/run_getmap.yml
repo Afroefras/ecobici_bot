@@ -2,7 +2,7 @@ name: Ecobici bot
 
 on:
   schedule:
-    - cron: '0 * * * *' # runs every hour, more info at https://crontab.guru/
+    - cron: '0 12 * * *' # runs at 12hrs utc, more info at https://crontab.guru/
 
 jobs:
   build:

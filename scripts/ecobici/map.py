@@ -2,7 +2,6 @@
 from io import BytesIO
 from pathlib import Path
 from zipfile import ZipFile
-from IPython.display import display
 from json import loads as loads_json
 from requests import get as get_request
 
@@ -80,7 +79,6 @@ class EcoBiciMap:
 
         self.set_custom_legend(ax, cmap, values=[(0.0, 'Hay bicis'), (0.5, 'Puede haber'), (1.0, 'No hay bicis')])
         fig.savefig(self.base_dir.joinpath('media','map','map.png'))
-        display(fig)
 
 
     def get_map(self, **kwargs) -> None:

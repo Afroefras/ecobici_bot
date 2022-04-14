@@ -14,6 +14,36 @@ from seaborn import scatterplot
 from matplotlib.lines import Line2D
 from matplotlib.pyplot import Axes, Figure, get_cmap
 
+
+
+
+### CHECAR FUNCIÓN PARA CREAR TWEET
+   
+import os
+from datetime import datetime
+
+from twython import Twython
+
+
+def tweet(image_path: str) -> None:
+
+    app_key = os.environ["API_KEY"]
+    app_secret = os.environ["API_SECRET"]
+    oauth_token = os.environ["ACCESS_TOKEN"]
+    oauth_token_secret = os.environ["ACCESS_TOKEN_SECRET"]
+    twitter = Twython(app_key, app_secret, oauth_token, oauth_token_secret)
+
+    now = datetime.now().strftime("%m/%d/%Y, %H:%M")
+
+    with open(image_path, "rb") as cycles_png:
+        image = twitter.upload_media(media=cycles_png)
+
+    twitter.update_status(status=f"London Cycles update at {now}", media_ids=[image["media_id"]])
+
+
+
+
+
 class EcoBiciMap:
     def __init__(self, client_id: str, client_secret: str) -> None:
         self.base_dir = Path().cwd()
@@ -87,4 +117,6 @@ class EcoBiciMap:
         self.av = self.get_data(availability=True)
         self.get_shapefile()
         self.transform()
+        now = datetime.now().strftime("%m/%d/%Y-%H:%M")
+        self.df.to_csv(self.base_dir.joinpath('data', 'csv', f'data_{now}.csv'))
         self.plot_map(**kwargs)

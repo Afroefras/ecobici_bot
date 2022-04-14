@@ -27,7 +27,7 @@ jobs:
         env: 
           ECOBICI_CLIENT_ID: ${{ secrets.ECOBICI_CLIENT_ID }}
           ECOBICI_CLIENT_SECRET: ${{ secrets.ECOBICI_CLIENT_SECRET }}
-        run: python ./scripts/ecobici/run_getmap.py
+        run: python ./scripts/run_getmap.py
 
       - name: Get current date
         id: date

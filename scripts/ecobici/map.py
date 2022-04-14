@@ -46,7 +46,7 @@ def tweet(image_path: str) -> None:
 
 class EcoBiciMap:
     def __init__(self, client_id: str, client_secret: str) -> None:
-        self.base_dir = Path().cwd()
+        self.base_dir = Path().cwd().parent.parent
         self.base_url = "https://pubsbapi-latam.smartbike.com"
         self.user_credentials = f"oauth/v2/token?client_id={client_id}&client_secret={client_secret}"
     
@@ -118,5 +118,5 @@ class EcoBiciMap:
         self.get_shapefile()
         self.transform()
         now = datetime.now().strftime("%m-%d-%YT%H:%M")
-        self.df.to_csv(self.base_dir.joinpath('data', 'csv', f'data_{now}.csv'))
+        self.df.to_csv(self.base_dir.joinpath('data', 'csv', f'data_{now}.csv'), index=False)
         self.plot_map(**kwargs)

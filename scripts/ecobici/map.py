@@ -117,6 +117,6 @@ class EcoBiciMap:
         self.av = self.get_data(availability=True)
         self.get_shapefile()
         self.transform()
-        now = datetime.now().strftime("%m-%d-%YT%H:%M")
+        now = datetime.now().strftime(r"%Y-%m-%dT%H:%M")
         self.df.to_csv(self.base_dir.joinpath('data', 'csv', f'data_{now}.csv'), index=False)
         self.plot_map(**kwargs)

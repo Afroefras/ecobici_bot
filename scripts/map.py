@@ -18,27 +18,39 @@ from matplotlib.pyplot import Axes, Figure, get_cmap
 
 class EcoBiciMap:
     def __init__(self, client_id: str, client_secret: str) -> None:
-        self.base_dir = Path().cwd()#.parent
+        # Obtiene el directorio actual
+        self.base_dir = Path().cwd()
+        # Dominio web base, de donde se anexarán rutas y parámetros
         self.base_url = "https://pubsbapi-latam.smartbike.com"
+        # Ruta con las credenciales de acceso
         self.user_credentials = f"oauth/v2/token?client_id={client_id}&client_secret={client_secret}"
     
 
     def get_token(self, first_time: bool=False) -> None:
+        # URL completa para recibir el token de acceso y el token de actualización (se ocupa si la sesión dura más de 60min)
         if first_time: URL = f"{self.base_url}/{self.user_credentials}&grant_type=client_credentials"
+        # En el caso que se accese por 2a ocasión o más, se llama al token de actualización
         else: URL = f"{self.base_url}/{self.user_credentials}&grant_type=refresh_token&refresh_token={self.REFRESH_TOKEN}"
 
+        # Obtiene la respuesta a la solicitud de la URL
         req_text = get_request(URL).text
+        # Lee el formato json para guardar los tokens
         data = loads_json(req_text)
+
+        # Guarda los tokens
         self.ACCESS_TOKEN = data['access_token']
         self.REFRESH_TOKEN = data['refresh_token']
 
 
     def get_data(self, availability: bool=False) -> None:
+        # URL para obtener la información en tiempo real, ya sea la info de las estaciones y/o la disponibilidad de las mismas
         stations_url = f"{self.base_url}/api/v1/stations{'/status' if availability else ''}.json?access_token={self.ACCESS_TOKEN}"
         req_text = get_request(stations_url).text
         data = loads_json(req_text)
 
+        # El json resultado tiene la data encapsulada en la primer llave
         first_key = list(data.keys())[0]
+        # Se estructura como tabla 
         df = json_normalize(data[first_key])
         return df
 

@@ -58,9 +58,8 @@ class EcoBiciMap:
     def get_shapefile(self, shapefile_url: str='https://datos.cdmx.gob.mx/dataset/7abff432-81a0-4956-8691-0865e2722423/resource/8ee17d1b-2d65-4f23-873e-fefc9e418977/download/cp_cdmx.zip') -> None:
         req_data = get_request(shapefile_url).content
         zip_file = ZipFile(BytesIO(req_data))
-        shapefile_dir = self.base_dir.joinpath('data','shp')
-        zip_file.extractall(shapefile_dir)
-        self.gdf = read_file(shapefile_dir).to_crs(epsg=4326)
+        zip_file.extractall(self.shapefile_dir)
+        self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
 
 
     def transform(self, station_cols: list=['id','zipCode','location.lat','location.lon'], id_col: str='id', status_col: str='status', bikes_col: str='availability.bikes', slots_col: str='availability.slots') -> None:
@@ -95,11 +94,13 @@ class EcoBiciMap:
         fig.savefig(self.base_dir.joinpath('media','map','map.png'))
 
 
-    def get_map(self, **kwargs) -> None:
+    def get_map(self, first_time: bool=True, **kwargs) -> None:
         self.get_token(first_time=True)
         self.st = self.get_data()
         self.av = self.get_data(availability=True)
-        self.get_shapefile()
+        self.shapefile_dir = self.base_dir.joinpath('data','shp')
+        if first_time: self.get_shapefile()
+        else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
         now = datetime.now().strftime(r"%Y-%m-%dT%H_%M")
         self.plot_map(**kwargs)

@@ -7,7 +7,7 @@ from json import loads as loads_json
 from requests import get as get_request
 
 # Ingeniería de variables
-from pandas import json_normalize
+from pandas import DataFrame, json_normalize
 from geopandas import read_file
 
 # Gráficas
@@ -18,31 +18,53 @@ from matplotlib.pyplot import Axes, Figure, get_cmap
 
 class EcoBiciMap:
     def __init__(self, client_id: str, client_secret: str) -> None:
+        '''
+        Define el directorio base, la URL base y las credenciales para el acceso a la API Ecobici
+
+        :client_id: user_uuid proporcionado por Ecobici. Más info en: https://www.ecobici.cdmx.gob.mx/sites/default/files/pdf/manual_api_opendata_esp_final.pdf 
+        :secret_id: contraseña propoprcionada por Ecobici, en un correo aparte para mayor seguridad
+        '''
         # Obtiene el directorio actual
         self.base_dir = Path().cwd()
         # Dominio web base, de donde se anexarán rutas y parámetros
         self.base_url = "https://pubsbapi-latam.smartbike.com"
         # Ruta con las credenciales de acceso
         self.user_credentials = f"oauth/v2/token?client_id={client_id}&client_secret={client_secret}"
-    
+
 
     def get_token(self, first_time: bool=False) -> None:
-        # URL completa para recibir el token de acceso y el token de actualización (se ocupa si la sesión dura más de 60min)
-        if first_time: URL = f"{self.base_url}/{self.user_credentials}&grant_type=client_credentials"
-        # En el caso que se accese por 2a ocasión o más, se llama al token de actualización
-        else: URL = f"{self.base_url}/{self.user_credentials}&grant_type=refresh_token&refresh_token={self.REFRESH_TOKEN}"
+        '''
+        Guarda los tokens de acceso, necesarios para solicitar la información de estaciones y disponibilidad
 
-        # Obtiene la respuesta a la solicitud de la URL
+        :first_time: 
+            - True para obtener ACCESS_TOKEN y REFRESH_TOKEN usando las credenciales por primera vez
+            - False para continuar con acceso a la API (después de 60min) y renovar ACCESS_TOKEN a través del REFRESH_TOKEN
+        '''
+        # URL completa para recibir el token de acceso y el token de actualización (se ocupa si la sesión dura más de 60min)
+        if first_time: 
+            URL = f"{self.base_url}/{self.user_credentials}&grant_type=client_credentials"
+        # En el caso que se accese por 2a ocasión o más, se llama al token de actualización
+        else: 
+            URL = f"{self.base_url}/{self.user_credentials}&grant_type=refresh_token&refresh_token={self.REFRESH_TOKEN}"
+
+        # Obtiene la respuesta a la solicitud de la URL, los datos vienen en bits
         req_text = get_request(URL).text
-        # Lee el formato json para guardar los tokens
+        # Convierte los bits a formato json para guardar los tokens
         data = loads_json(req_text)
 
-        # Guarda los tokens
+        # Guarda los tokens como atributos
         self.ACCESS_TOKEN = data['access_token']
         self.REFRESH_TOKEN = data['refresh_token']
 
 
-    def get_data(self, availability: bool=False) -> None:
+    def get_data(self, availability: bool=False) -> DataFrame:
+        '''
+        Obtiene la información de estaciones y disponibilidad al momento
+
+        :availabilty:
+            - True para obtener los datos de disponibilidad
+            - False para obtener la información respecto a las estaciones
+        '''
         # URL para obtener la información en tiempo real, ya sea la info de las estaciones y/o la disponibilidad de las mismas
         stations_url = f"{self.base_url}/api/v1/stations{'/status' if availability else ''}.json?access_token={self.ACCESS_TOKEN}"
         req_text = get_request(stations_url).text
@@ -56,20 +78,44 @@ class EcoBiciMap:
 
 
     def get_shapefile(self, shapefile_url: str='https://datos.cdmx.gob.mx/dataset/7abff432-81a0-4956-8691-0865e2722423/resource/8ee17d1b-2d65-4f23-873e-fefc9e418977/download/cp_cdmx.zip') -> None:
+        '''
+        Obtiene y descomprime el zip que contiene el shapefile 
+        (varias carpetas que en conjunto, definen una zona geográfica)
+
+        :shapefile_url: liga gubernamental y oficial respecto a la delimitación de colonias en CDMX
+        '''
+        # Obtener los datos de la URL
         req_data = get_request(shapefile_url).content
-        zip_file = ZipFile(BytesIO(req_data))
-        zip_file.extractall(self.shapefile_dir)
+        # Extraer la información del ZIP, que es un SHP file 
+        zipfile = ZipFile(BytesIO(req_data))
+        zipfile.extractall(self.shapefile_dir)
+        # Se estructura como tabla, para poder gráficar las colonias de la CDMX
         self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
 
 
     def transform(self, station_cols: list=['id','zipCode','location.lat','location.lon'], id_col: str='id', status_col: str='status', bikes_col: str='availability.bikes', slots_col: str='availability.slots') -> None:
+        '''
+        Une las tablas de estaciones y disponibilidad. Crea las variables de proporción en bicicletas y slots vacíos
+
+        :station_cols:  columnas de interés respecto a la tabla de estaciones
+        :id_col:        identificación de la estación Ecobici
+        :status_col:    columna que indica el estatus de la estación, sólo se mantendrá estaciones abiertas
+        :bikes_col:     columna que indica las bicicletas disponibles
+        :slots_col:     columna que indica los slots vacíos
+        '''
+        # Une la información de estaciones con la disponibilidad de las mismas
         self.df = self.st[station_cols].merge(self.av, on=id_col)
+        # Sólo las estaciones con estatus disponible
         self.df = self.df[self.df[status_col]=='OPN'].copy()
+        # Calcula la proporción de disponibilidad, tanto de bicicletas, como de slots vacíos
         self.df['slots_proportion'] = self.df[slots_col] / (self.df[slots_col] + self.df[bikes_col])
         self.df['bikes_proportion'] = 1 - self.df['slots_proportion']
 
 
     def set_custom_legend(self, ax, cmap, values: list) -> None:
+        ''''
+        Modifica las etiquetas para un mapa de calor
+        '''
         legend_elements = []
         for gradient, label in values:
             color = cmap(gradient)
@@ -78,32 +124,39 @@ class EcoBiciMap:
 
 
     def plot_map(self, lat_col: str='location.lat', lon_col: str='location.lon', padding: float=0.007, points_palette: str='mako', **kwargs) -> None:
+        # Crea el lienzo para graficar el mapa
         fig = Figure(figsize=(5, 4), dpi=200, frameon=False)
         ax = Axes(fig, [0.0, 0.0, 1.0, 1.0])
         fig.add_axes(ax)
         ax.set_axis_off()
+        
+        # Delimita el tamaño dependiendo el rango de las coordenadas
         ax.set_ylim((self.df[lat_col].min() - padding, self.df[lat_col].max() + padding))
         ax.set_xlim((self.df[lon_col].min() - padding, self.df[lon_col].max() + padding))
 
+        # Grafica el mapa de las colonias en CDMX
         self.gdf.plot(ax=ax, linewidth=0.5, **kwargs)
 
+        # Grafica cada estación, asignando el color dependiendo la disponibilidad
         cmap = get_cmap(points_palette)
-        scatterplot(y=lat_col, x=lon_col, hue='slots_proportion', data=self.df, ax=ax, palette=cmap)
+        scatterplot(y=lat_col, x=lon_col, data=self.df, ax=ax, palette=cmap, hue='slots_proportion')
 
+        # Modifica las etiquetas para indicar el significado del color en las estaciones
         self.set_custom_legend(ax, cmap, values=[(0.0, 'Hay bicis'), (0.5, 'Puede haber'), (1.0, 'No hay bicis')])
+        # Guarda la imagen
         fig.savefig(self.base_dir.joinpath('media','map','map.png'))
 
 
-    def get_map(self, first_time: bool=True, **kwargs) -> None:
+    def get_map(self, shp_first_time: bool=True, **kwargs) -> None:
         self.get_token(first_time=True)
         self.st = self.get_data()
         self.av = self.get_data(availability=True)
         self.shapefile_dir = self.base_dir.joinpath('data','shp')
-        if first_time: self.get_shapefile()
+        if shp_first_time: self.get_shapefile()
         else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
-        now = datetime.now().strftime(r"%Y-%m-%dT%H_%M")
         self.plot_map(**kwargs)
+        now = datetime.now().strftime(r"%Y-%m-%dT%H_%M")
         self.df.to_csv(self.base_dir.joinpath('data', 'csv', f'data_{now}.csv'), index=False)
 
 

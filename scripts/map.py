@@ -15,9 +15,11 @@ from seaborn import scatterplot
 from matplotlib.lines import Line2D
 from matplotlib.pyplot import Axes, Figure, get_cmap
 
+# Twitter
+from twython import Twython
 
 class EcoBiciMap:
-    def __init__(self, client_id: str, client_secret: str) -> None:
+    def __init__(self, client_id: str, client_secret: str, twitter_key: str, twitter_secret: str, access_token: str, access_secret: str) -> None:
         '''
         Define el directorio base, la URL base y las credenciales para el acceso a la API Ecobici
 
@@ -30,6 +32,13 @@ class EcoBiciMap:
         self.base_url = "https://pubsbapi-latam.smartbike.com"
         # Ruta con las credenciales de acceso
         self.user_credentials = f"oauth/v2/token?client_id={client_id}&client_secret={client_secret}"
+        # Guarda como atributos las credenciales necesarias para crear tweets
+        self.twitter_key = twitter_key
+        self.twitter_secret = twitter_secret
+        self.access_token = access_token
+        self.access_secret = access_secret
+        # Fecha y hora en la que se instancia la clase
+        self.started_at = datetime.now().strftime(r"%Y-%m-%dT%H_%M")
 
 
     def get_token(self, first_time: bool=False) -> None:
@@ -147,6 +156,16 @@ class EcoBiciMap:
         fig.savefig(self.base_dir.joinpath('media','map','map.png'))
 
 
+    def tweet_map(self) -> None:
+        twitter = Twython(self.twitter_key, self.twitter_secret, self.access_token, self.access_secret)
+
+        with open(self.base_dir.joinpath('media','map','map.png'), "rb") as img:
+            image = twitter.upload_media(media=img)
+
+        format_datetime = self.started_at.replace('-','/').replace('T', ' ').replace('_',':')
+        twitter.update_status(status=f"Ecobici: {format_datetime}", media_ids=[image["media_id"]])
+
+
     def get_map(self, shp_first_time: bool=True, **kwargs) -> None:
         self.get_token(first_time=True)
         self.st = self.get_data()
@@ -156,30 +175,5 @@ class EcoBiciMap:
         else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
         self.plot_map(**kwargs)
-        now = datetime.now().strftime(r"%Y-%m-%dT%H_%M")
-        self.df.to_csv(self.base_dir.joinpath('data', 'csv', f'data_{now}.csv'), index=False)
-
-
-
-### CHECAR FUNCIÓN PARA CREAR TWEET
-   
-# import os
-# from datetime import datetime
-
-# from twython import Twython
-
-
-# def tweet(image_path: str) -> None:
-
-#     app_key = os.environ["API_KEY"]
-#     app_secret = os.environ["API_SECRET"]
-#     oauth_token = os.environ["ACCESS_TOKEN"]
-#     oauth_token_secret = os.environ["ACCESS_TOKEN_SECRET"]
-#     twitter = Twython(app_key, app_secret, oauth_token, oauth_token_secret)
-
-#     now = datetime.now().strftime("%m/%d/%Y, %H:%M")
-
-#     with open(image_path, "rb") as cycles_png:
-#         image = twitter.upload_media(media=cycles_png)
-
-#     twitter.update_status(status=f"London Cycles update at {now}", media_ids=[image["media_id"]])
+        self.tweet_map()
+        self.df.to_csv(self.base_dir.joinpath('data', 'csv', f'data_{self.started_at}.csv'), index=False)

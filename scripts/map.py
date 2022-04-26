@@ -183,7 +183,7 @@ class EcoBiciMap:
         with open(img, "rb") as img:
             image = twitter.upload_media(media=img)
 
-        twitter.update_status(status=f"Ecobici: {str(self.started_at_format)}", media_ids=[image["media_id"]])
+        twitter.update_status(status=f"Disponibilidad {str(self.started_at_format)}", media_ids=[image["media_id"]])
 
 
     def save_csv(self) -> None:

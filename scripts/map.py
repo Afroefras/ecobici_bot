@@ -1,5 +1,7 @@
 # Control de datos
 from io import BytesIO
+from operator import length_hint
+from dateutil import tz
 from pathlib import Path
 from zipfile import ZipFile
 from datetime import datetime
@@ -28,6 +30,8 @@ class EcoBiciMap:
         '''
         # Obtiene el directorio actual
         self.base_dir = Path().cwd()
+        self.csv_dir = self.base_dir.joinpath('data','csv')
+        self.shapefile_dir = self.base_dir.joinpath('data','shp')
         # Dominio web base, de donde se anexarán rutas y parámetros
         self.base_url = "https://pubsbapi-latam.smartbike.com"
         # Ruta con las credenciales de acceso
@@ -38,7 +42,16 @@ class EcoBiciMap:
         self.access_token = access_token
         self.access_secret = access_secret
         # Fecha y hora en la que se instancia la clase
-        self.started_at = datetime.now()
+        self.started_at = datetime.now().astimezone(tz.gettz('America/Mexico_City'))
+        self.started_at_format = self.started_at.strftime(r'%d/%b/%Y %H:%M')
+
+    def __str__(self) -> str:
+        return f'''
+        {self.started_at_format}
+
+        Clase para extraer información de la API Ecobici (https://www.ecobici.cdmx.gob.mx/sites/default/files/pdf/manual_api_opendata_esp_final.pdf)
+        transformar, graficar la disponibilidad en un mapa de calor, exportar los datos y crear un tweet con el mapa.
+        '''
 
 
     def get_token(self, first_time: bool=False) -> None:
@@ -132,7 +145,7 @@ class EcoBiciMap:
         ax.legend(handles=legend_elements, loc="lower right", prop={"size": 6}, ncol=len(values))
 
 
-    def plot_map(self, lat_col: str='location.lat', lon_col: str='location.lon', padding: float=0.007, points_palette: str='mako', **kwargs) -> None:
+    def plot_map(self, lat_col: str='location.lat', lon_col: str='location.lon', padding: float=0.007, points_palette: str='mako', fit_twitter: bool=False, **kwargs) -> None:
         # Crea el lienzo para graficar el mapa
         fig = Figure(figsize=(5, 4), dpi=200, frameon=False)
         ax = Axes(fig, [0.0, 0.0, 1.0, 1.0])
@@ -141,7 +154,13 @@ class EcoBiciMap:
         
         # Delimita el tamaño dependiendo el rango de las coordenadas
         ax.set_ylim((self.df[lat_col].min() - padding, self.df[lat_col].max() + padding))
-        ax.set_xlim((self.df[lon_col].min() - padding, self.df[lon_col].max() + padding))
+        if fit_twitter:
+            img_center_y = (self.df[lat_col].max() - self.df[lat_col].min())/2
+            img_center_x = (self.df[lon_col].max() - self.df[lon_col].min())/2
+            # img_height*0.8
+            ax.set_xlim(())
+
+        else: ax.set_xlim((self.df[lon_col].min() - padding, self.df[lon_col].max() + padding))
 
         # Grafica el mapa de las colonias en CDMX
         self.gdf.plot(ax=ax, linewidth=0.5, **kwargs)
@@ -153,37 +172,38 @@ class EcoBiciMap:
         # Modifica las etiquetas para indicar el significado del color en las estaciones
         self.set_custom_legend(ax, cmap, values=[(0.0, 'Hay bicis'), (0.5, 'Puede haber'), (1.0, 'No hay bicis')])
         # Guarda la imagen
-        fig.savefig(self.base_dir.joinpath('media','map','map.png'))
+        self.eb_map = fig
+        try: self.eb_map.savefig(self.base_dir.joinpath('media','map','map.png'))
+        except: pass
 
 
-    def tweet_map(self) -> None:
+    def tweet_map(self, img) -> None:
         twitter = Twython(self.twitter_key, self.twitter_secret, self.access_token, self.access_secret)
 
-        with open(self.base_dir.joinpath('media','map','map.png'), "rb") as img:
+        with open(img, "rb") as img:
             image = twitter.upload_media(media=img)
 
-        twitter.update_status(status=f"Ecobici: {str(self.started_at)}", media_ids=[image["media_id"]])
+        twitter.update_status(status=f"Ecobici: {str(self.started_at_format)}", media_ids=[image["media_id"]])
 
 
     def save_csv(self) -> None:
-        acum = read_csv(self.base_dir.joinpath('data', 'csv', 'acum_data.csv'))
+        acum = read_csv(self.csv_dir.joinpath('acum_data.csv'))
         try:
             new = self.df.copy()
             new['date'] = str(self.started_at.date())
             new['time'] = str(self.started_at.time())
             acum = concat([acum, new], ignore_index=True)
         except: pass
-        finally: acum.to_csv(self.base_dir.joinpath('data', 'csv', 'acum_data.csv'), index=False)
+        finally: acum.to_csv(self.csv_dir.joinpath('acum_data.csv'), index=False)
 
 
     def get_map(self, shp_first_time: bool=True, **kwargs) -> None:
         self.get_token(first_time=True)
         self.st = self.get_data()
         self.av = self.get_data(availability=True)
-        self.shapefile_dir = self.base_dir.joinpath('data','shp')
         if shp_first_time: self.get_shapefile()
         else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
         self.plot_map(**kwargs)
-        self.tweet_map()
+        self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
         self.save_csv()

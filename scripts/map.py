@@ -162,8 +162,7 @@ class EcoBiciMap:
         with open(self.base_dir.joinpath('media','map','map.png'), "rb") as img:
             image = twitter.upload_media(media=img)
 
-        format_datetime = self.started_at.replace('-','/').replace('T', ' ').replace('_',':')
-        twitter.update_status(status=f"Ecobici: {format_datetime}", media_ids=[image["media_id"]])
+        twitter.update_status(status=f"Ecobici: {self.started_at}", media_ids=[image["media_id"]])
 
 
     def save_csv(self) -> None:

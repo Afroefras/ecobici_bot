@@ -162,7 +162,7 @@ class EcoBiciMap:
         with open(self.base_dir.joinpath('media','map','map.png'), "rb") as img:
             image = twitter.upload_media(media=img)
 
-        twitter.update_status(status=f"Ecobici: {self.started_at}", media_ids=[image["media_id"]])
+        twitter.update_status(status=f"Ecobici: {str(self.started_at)}", media_ids=[image["media_id"]])
 
 
     def save_csv(self) -> None:
@@ -173,7 +173,7 @@ class EcoBiciMap:
             new['time'] = str(self.started_at.time())
             acum = concat([acum, new], ignore_index=True)
         except: pass
-        finally: acum.to_csv(self.base_dir.joinpath('data', 'csv', f'acum_data.csv'), index=False)
+        finally: acum.to_csv(self.base_dir.joinpath('data', 'csv', 'acum_data.csv'), index=False)
 
 
     def get_map(self, shp_first_time: bool=True, **kwargs) -> None:

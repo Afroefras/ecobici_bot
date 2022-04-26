@@ -7,7 +7,7 @@ from json import loads as loads_json
 from requests import get as get_request
 
 # Ingeniería de variables
-from pandas import DataFrame, json_normalize
+from pandas import DataFrame, json_normalize, read_csv, concat
 from geopandas import read_file
 
 # Gráficas
@@ -38,7 +38,7 @@ class EcoBiciMap:
         self.access_token = access_token
         self.access_secret = access_secret
         # Fecha y hora en la que se instancia la clase
-        self.started_at = datetime.now().strftime(r"%Y-%m-%dT%H_%M")
+        self.started_at = datetime.now()
 
 
     def get_token(self, first_time: bool=False) -> None:
@@ -166,6 +166,17 @@ class EcoBiciMap:
         twitter.update_status(status=f"Ecobici: {format_datetime}", media_ids=[image["media_id"]])
 
 
+    def save_csv(self) -> None:
+        acum = read_csv(self.base_dir.joinpath('data', 'csv', 'acum_data.csv'))
+        try:
+            new = self.df.copy()
+            new['date'] = str(self.started_at.date())
+            new['time'] = str(self.started_at.time())
+            acum = concat([acum, new], ignore_index=True)
+        except: pass
+        finally: acum.to_csv(self.base_dir.joinpath('data', 'csv', f'acum_data.csv'), index=False)
+
+
     def get_map(self, shp_first_time: bool=True, **kwargs) -> None:
         self.get_token(first_time=True)
         self.st = self.get_data()
@@ -176,4 +187,4 @@ class EcoBiciMap:
         self.transform()
         self.plot_map(**kwargs)
         self.tweet_map()
-        self.df.to_csv(self.base_dir.joinpath('data', 'csv', f'data_{self.started_at}.csv'), index=False)
+        self.save_csv()

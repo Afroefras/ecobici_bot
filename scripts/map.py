@@ -155,6 +155,7 @@ class EcoBiciMap:
         # Delimita el tamaño dependiendo el rango de las coordenadas
         ax.set_ylim((self.df[lat_col].min() - padding, self.df[lat_col].max() + padding))
         if fit_twitter:
+            img_height = self.df[lat_col].max() - self.df[lat_col].min()
             img_center_y = (self.df[lat_col].max() - self.df[lat_col].min())/2
             img_center_x = (self.df[lon_col].max() - self.df[lon_col].min())/2
             # img_height*0.8
@@ -205,5 +206,6 @@ class EcoBiciMap:
         else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
         self.plot_map(**kwargs)
-        self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
+        # No crear el tweet hasta que el resultado aporte más valor para el usuario
+        # self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
         self.save_csv()

@@ -155,14 +155,7 @@ class EcoBiciMap:
         
         # Delimita el tamaño dependiendo el rango de las coordenadas
         ax.set_ylim((self.df[lat_col].min() - padding, self.df[lat_col].max() + padding))
-        if fit_twitter:
-            img_height = self.df[lat_col].max() - self.df[lat_col].min()
-            img_center_y = (self.df[lat_col].max() - self.df[lat_col].min())/2
-            img_center_x = (self.df[lon_col].max() - self.df[lon_col].min())/2
-            # img_height*0.8
-            ax.set_xlim(())
-
-        else: ax.set_xlim((self.df[lon_col].min() - padding, self.df[lon_col].max() + padding))
+        ax.set_xlim((self.df[lon_col].min() - padding, self.df[lon_col].max() + padding))
 
         # Grafica el mapa de las colonias en CDMX
         self.gdf.plot(ax=ax, figsize=(8, 8), linewidth=0.5, **kwargs)
@@ -188,6 +181,7 @@ class EcoBiciMap:
             image = twitter.upload_media(media=img)
 
         twitter.update_status(status=f"Disponibilidad {str(self.started_at_format)}", media_ids=[image["media_id"]])
+
 
 
     def save_csv(self) -> None:

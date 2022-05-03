@@ -142,7 +142,7 @@ class EcoBiciMap:
         for gradient, label in values:
             color = cmap(gradient)
             legend_elements.append(Line2D([0], [0], marker="o", color="w", label=label, markerfacecolor=color, markeredgewidth=0.5, markeredgecolor="k"))
-        ax.legend(handles=legend_elements, loc="lower right", prop={"size": 6}, ncol=len(values))
+        ax.legend(handles=legend_elements, loc="upper left", prop={"size": 4}, ncol=len(values))
 
 
     def plot_map(self, lat_col: str='location.lat', lon_col: str='location.lon', padding: float=0.007, points_palette: str='mako', fit_twitter: bool=False, **kwargs) -> None:

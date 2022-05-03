@@ -1,6 +1,5 @@
 # Control de datos
 from io import BytesIO
-from operator import length_hint
 from dateutil import tz
 from pathlib import Path
 from zipfile import ZipFile

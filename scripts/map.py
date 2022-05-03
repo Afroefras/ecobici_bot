@@ -15,6 +15,7 @@ from geopandas import read_file
 # Gráficas
 from seaborn import scatterplot
 from matplotlib.lines import Line2D
+from contextily import add_basemap, providers
 from matplotlib.pyplot import Axes, Figure, get_cmap
 
 # Twitter
@@ -164,7 +165,9 @@ class EcoBiciMap:
         else: ax.set_xlim((self.df[lon_col].min() - padding, self.df[lon_col].max() + padding))
 
         # Grafica el mapa de las colonias en CDMX
-        self.gdf.plot(ax=ax, linewidth=0.5, **kwargs)
+        self.gdf.plot(ax=ax, figsize=(8, 8), linewidth=0.5, **kwargs)
+        # Agrega etiquetas de calles/colonias
+        add_basemap(ax, crs=self.gdf.crs, source=providers.Stamen.TonerLabels, interpolation='sinc', aspect='equal')
 
         # Grafica cada estación, asignando el color dependiendo la disponibilidad
         cmap = get_cmap(points_palette)

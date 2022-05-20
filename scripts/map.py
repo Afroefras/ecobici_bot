@@ -218,7 +218,7 @@ class EcoBiciMap:
         self.transform()
         self.save_csv()
         self.plot_map(data=self.df, col_to_plot='slots_proportion', **kwargs)
-        self.prediction_data(file_name='df_for_map.csv')
+        self.prediction_data(file_name='df_for_map.csv', is_local=False)
         self.plot_map(data=self.pred, col_to_plot='pred_bike_proportion', img_name='future_map',**kwargs)
         # self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
         self.tweet_map(img=self.base_dir.joinpath('media','map','future_map.png'))

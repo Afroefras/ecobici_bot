@@ -3,13 +3,13 @@ from io import BytesIO
 from dateutil import tz
 from pathlib import Path
 from zipfile import ZipFile
-from datetime import datetime
 from json import loads as loads_json
+from datetime import datetime, timedelta
 from requests import get as get_request
 
 # Ingeniería de variables
-from pandas import DataFrame, json_normalize, read_csv, concat
 from geopandas import read_file
+from pandas import DataFrame, json_normalize, read_csv, concat
 
 # Gráficas
 from seaborn import scatterplot
@@ -30,6 +30,8 @@ class EcoBiciMap:
         '''
         # Obtiene el directorio actual
         self.base_dir = Path().cwd()
+        # self.base_dir = Path('/Users/efraflores/Desktop/hub/ecobici_bot')
+
         self.csv_dir = self.base_dir.joinpath('data','csv')
         self.shapefile_dir = self.base_dir.joinpath('data','shp')
         # Dominio web base, de donde se anexarán rutas y parámetros
@@ -145,7 +147,7 @@ class EcoBiciMap:
         ax.legend(handles=legend_elements, loc="upper left", prop={"size": 4}, ncol=len(values))
 
 
-    def plot_map(self, lat_col: str='location.lat', lon_col: str='location.lon', padding: float=0.007, points_palette: str='mako', **kwargs) -> None:
+    def plot_map(self, data: DataFrame, col_to_plot: str, lat_col: str='location.lat', lon_col: str='location.lon', img_name: str='map', padding: float=0.007, points_palette: str='mako', **kwargs) -> None:
         # Crea el lienzo para graficar el mapa
         fig = Figure(figsize=(5, 4), dpi=200, frameon=False)
         ax = Axes(fig, [0.0, 0.0, 1.0, 1.0])
@@ -153,8 +155,8 @@ class EcoBiciMap:
         ax.set_axis_off()
         
         # Delimita el tamaño dependiendo el rango de las coordenadas
-        ax.set_ylim((self.df[lat_col].min() - padding, self.df[lat_col].max() + padding))
-        ax.set_xlim((self.df[lon_col].min() - padding, self.df[lon_col].max() + padding))
+        ax.set_ylim((data[lat_col].min() - padding, data[lat_col].max() + padding))
+        ax.set_xlim((data[lon_col].min() - padding, data[lon_col].max() + padding))
 
         # Grafica el mapa de las colonias en CDMX
         self.gdf.plot(ax=ax, figsize=(8, 8), linewidth=0.5, **kwargs)
@@ -163,13 +165,13 @@ class EcoBiciMap:
 
         # Grafica cada estación, asignando el color dependiendo la disponibilidad
         cmap = get_cmap(points_palette)
-        scatterplot(y=lat_col, x=lon_col, data=self.df, ax=ax, palette=cmap, hue='slots_proportion')
+        scatterplot(y=lat_col, x=lon_col, data=data, ax=ax, palette=cmap, hue=col_to_plot)
 
         # Modifica las etiquetas para indicar el significado del color en las estaciones
         self.set_custom_legend(ax, cmap, values=[(0.0, 'Hay bicis'), (0.5, 'Puede haber'), (1.0, 'No hay bicis')])
         # Guarda la imagen
         self.eb_map = fig
-        try: self.eb_map.savefig(self.base_dir.joinpath('media','map','map.png'))
+        try: self.eb_map.savefig(self.base_dir.joinpath('media','map',f'{img_name}.png'))
         except: pass
 
 
@@ -179,7 +181,7 @@ class EcoBiciMap:
         with open(img, "rb") as img:
             image = twitter.upload_media(media=img)
 
-        twitter.update_status(status=f"Disponibilidad {str(self.started_at_format)}", media_ids=[image["media_id"]])
+        twitter.update_status(status=f"Pronóstico de disponibilidad para {(self.started_at + timedelta(hours=1)).strftime(r'%d/%b/%Y %H:%M')}", media_ids=[image["media_id"]])
 
 
 
@@ -202,5 +204,15 @@ class EcoBiciMap:
         else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
         self.save_csv()
-        self.plot_map(**kwargs)
-        self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
+        self.plot_map(data=self.df, col_to_plot='slots_proportion', **kwargs)
+
+        pred = read_csv(self.base_dir.joinpath('data','for_map','df_for_map.csv'))
+        pred = pred.merge(self.av[['id', 'availability.bikes', 'availability.slots']])
+        pred['prediction'] = pred['prediction'].map(lambda x: 0 if x<0 else x)
+        pred['pred_bike_proportion'] = 1 - pred['prediction'] / (pred['availability.bikes'] + pred['availability.slots'])
+
+        pred.to_csv(self.base_dir.joinpath('test.csv'), index=False)
+
+        self.plot_map(data=pred, col_to_plot='pred_bike_proportion', img_name='future_map',**kwargs)
+        # self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
+        self.tweet_map(img=self.base_dir.joinpath('media','map','future_map.png'))

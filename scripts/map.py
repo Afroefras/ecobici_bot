@@ -22,7 +22,7 @@ from twython import Twython
 
 
 # Modelo
-from . import ecoTad, ecoPredict
+import ecoTad, ecoPredict
 
 class EcoBiciMap:
     def __init__(self, client_id: str, client_secret: str, twitter_key: str, twitter_secret: str, access_token: str, access_secret: str) -> None:

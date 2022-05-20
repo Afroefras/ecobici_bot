@@ -8,16 +8,16 @@ import pathlib
 from datetime import datetime, timedelta
 
 
-def run_ecotad():
+def run_ecotad(is_local: bool=False):
     # 1. Lectura de datos originales________________________________________________________________________
 
         # Ruta °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
-    BASE_DIR = pathlib.Path().cwd() #sustituir por ruta git*
-    # BASE_DIR = pathlib.Path('/Users/efraflores/Desktop/hub/ecobici_bot')
+    if is_local: BASE_DIR = pathlib.Path('/Users/efraflores/Desktop/hub/ecobici_bot')
+    else: BASE_DIR = pathlib.Path().cwd()
 
         # Lectura °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
-    ecodata = pd.read_csv(BASE_DIR.joinpath('data/csv/acum_data.csv')) #sustituir por ruta git*
-    ecodata_coordenadas = ecodata[['id','location.lat','location.lon','availability.slots']] # se agrego slots
+    ecodata = pd.read_csv(BASE_DIR.joinpath('data/csv/acum_data.csv')) 
+    ecodata_coordenadas = ecodata[['id','location.lat','location.lon']]
     ecodata_coordenadas = ecodata_coordenadas.drop_duplicates(subset=['id'])
     # print(ecodata)
 
@@ -208,4 +208,4 @@ def run_ecotad():
 
     ecodata_coordenadas.to_pickle(pathlib.Path().joinpath(BASE_DIR,'data/for_map/coordinates_frame_for_map.pkl')) #sustituir por ruta git*
 
-    print(tad.head())
+    # print(tad.head())

@@ -145,7 +145,7 @@ class EcoBiciMap:
         ax.legend(handles=legend_elements, loc="upper left", prop={"size": 4}, ncol=len(values))
 
 
-    def plot_map(self, lat_col: str='location.lat', lon_col: str='location.lon', padding: float=0.007, points_palette: str='mako', fit_twitter: bool=False, **kwargs) -> None:
+    def plot_map(self, lat_col: str='location.lat', lon_col: str='location.lon', padding: float=0.007, points_palette: str='mako', **kwargs) -> None:
         # Crea el lienzo para graficar el mapa
         fig = Figure(figsize=(5, 4), dpi=200, frameon=False)
         ax = Axes(fig, [0.0, 0.0, 1.0, 1.0])
@@ -201,7 +201,6 @@ class EcoBiciMap:
         if shp_first_time: self.get_shapefile()
         else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
-        self.plot_map(**kwargs)
-        # No crear el tweet hasta que el resultado aporte más valor para el usuario
-        # self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
         self.save_csv()
+        self.plot_map(**kwargs)
+        self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))

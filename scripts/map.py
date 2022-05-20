@@ -20,6 +20,10 @@ from matplotlib.pyplot import Axes, Figure, get_cmap
 # Twitter
 from twython import Twython
 
+
+# Modelo
+from . import ecoTad, ecoPredict
+
 class EcoBiciMap:
     def __init__(self, client_id: str, client_secret: str, twitter_key: str, twitter_secret: str, access_token: str, access_secret: str) -> None:
         '''
@@ -204,6 +208,10 @@ class EcoBiciMap:
         else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
         self.save_csv()
+
+        ecoTad.run_ecotad()
+        ecoPredict.run_ecopredict()
+
         self.plot_map(data=self.df, col_to_plot='slots_proportion', **kwargs)
 
         pred = read_csv(self.base_dir.joinpath('data','for_map','df_for_map.csv'))

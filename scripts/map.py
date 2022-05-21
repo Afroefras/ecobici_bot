@@ -177,7 +177,6 @@ class EcoBiciMap:
         # Guarda la imagen
         self.eb_map[img_name] = fig
         self.eb_map[img_name].savefig(self.base_dir.joinpath('media','map',f'{img_name}.png'))
-        # except: pass
 
 
     def tweet_map(self, img) -> None:
@@ -210,6 +209,7 @@ class EcoBiciMap:
         print(self.pred.shape)
         self.pred['prediction'] = self.pred['prediction'].map(lambda x: 0 if x<0 else x)
         self.pred['pred_bike_proportion'] = 1 - self.pred['prediction'] / (self.pred['availability.bikes'] + self.pred['availability.slots'])
+
 
     def get_map(self, img_name: str, shp_first_time: bool=True, **kwargs) -> None:
         self.get_token(first_time=True)

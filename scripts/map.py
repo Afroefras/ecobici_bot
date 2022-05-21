@@ -25,7 +25,7 @@ from twython import Twython
 import ecoTad, ecoPredict
 
 class EcoBiciMap:
-    def __init__(self, client_id: str, client_secret: str, twitter_key: str, twitter_secret: str, access_token: str, access_secret: str, is_local: bool=False) -> None:
+    def __init__(self, client_id: str, client_secret: str, twitter_key: str, twitter_secret: str, access_token: str, access_secret: str, is_local: bool=True) -> None:
         '''
         Define el directorio base, la URL base y las credenciales para el acceso a la API Ecobici
 
@@ -35,7 +35,6 @@ class EcoBiciMap:
         # Obtiene el directorio actual
         if is_local: self.base_dir = Path('/Users/efraflores/Desktop/hub/ecobici_bot')
         else: self.base_dir = Path().cwd()
-
         self.csv_dir = self.base_dir.joinpath('data','csv')
         self.shapefile_dir = self.base_dir.joinpath('data','shp')
         # Dominio web base, de donde se anexarán rutas y parámetros
@@ -50,6 +49,7 @@ class EcoBiciMap:
         # Fecha y hora en la que se instancia la clase
         self.started_at = datetime.now().astimezone(tz.gettz('America/Mexico_City'))
         self.started_at_format = self.started_at.strftime(r'%d/%b/%Y %H:%M')
+        self.is_local = is_local
         self.eb_map = {}
 
     def __str__(self) -> str:
@@ -176,8 +176,8 @@ class EcoBiciMap:
         self.set_custom_legend(ax, cmap, values=[(0.0, 'Hay bicis'), (0.5, 'Puede haber'), (1.0, 'No hay bicis')])
         # Guarda la imagen
         self.eb_map[img_name] = fig
-        try: self.eb_map.savefig(self.base_dir.joinpath('media','map',f'{img_name}.png'))
-        except: pass
+        self.eb_map[img_name].savefig(self.base_dir.joinpath('media','map',f'{img_name}.png'))
+        # except: pass
 
 
     def tweet_map(self, img) -> None:
@@ -205,11 +205,13 @@ class EcoBiciMap:
         ecoTad.run_ecotad(is_local=is_local)
         ecoPredict.run_ecopredict(is_local=is_local)
         self.pred = read_csv(self.base_dir.joinpath('data','for_map',file_name))
+        print(self.pred.shape)
         self.pred = self.pred.merge(self.av[['id', 'availability.bikes', 'availability.slots']], on='id')
+        print(self.pred.shape)
         self.pred['prediction'] = self.pred['prediction'].map(lambda x: 0 if x<0 else x)
         self.pred['pred_bike_proportion'] = 1 - self.pred['prediction'] / (self.pred['availability.bikes'] + self.pred['availability.slots'])
 
-    def get_map(self, shp_first_time: bool=True, **kwargs) -> None:
+    def get_map(self, img_name: str, shp_first_time: bool=True, **kwargs) -> None:
         self.get_token(first_time=True)
         self.st = self.get_data()
         self.av = self.get_data(availability=True)
@@ -218,7 +220,7 @@ class EcoBiciMap:
         self.transform()
         self.save_csv()
         self.plot_map(data=self.df, col_to_plot='slots_proportion', **kwargs)
-        self.prediction_data(file_name='df_for_map.csv', is_local=False)
-        self.plot_map(data=self.pred, col_to_plot='pred_bike_proportion', img_name='future_map', **kwargs)
+        self.prediction_data(file_name='df_for_map.csv', is_local=self.is_local)
+        self.plot_map(data=self.pred, col_to_plot='pred_bike_proportion', img_name=f'{img_name}', **kwargs)
         # self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
-        self.tweet_map(img=self.base_dir.joinpath('media','map','future_map.png'))
+        self.tweet_map(img=self.base_dir.joinpath('media', 'map', f'{img_name}.png'))

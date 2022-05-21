@@ -204,8 +204,8 @@ class EcoBiciMap:
     def prediction_data(self, file_name: str, is_local:bool) -> None:
         ecoTad.run_ecotad(is_local=is_local)
         ecoPredict.run_ecopredict(is_local=is_local)
-        self.pred_orig = read_csv(self.base_dir.joinpath('data','for_map',file_name))
-        self.pred = self.pred_orig.merge(self.av[['id', 'availability.bikes', 'availability.slots']], on='id')
+        self.pred = read_csv(self.base_dir.joinpath('data','for_map',file_name))
+        self.pred = self.pred.merge(self.av[['id', 'availability.bikes', 'availability.slots']], on='id')
         self.pred['prediction'] = self.pred['prediction'].map(lambda x: 0 if x<0 else x)
         self.pred['pred_bike_proportion'] = 1 - self.pred['prediction'] / (self.pred['availability.bikes'] + self.pred['availability.slots'])
 
@@ -219,6 +219,6 @@ class EcoBiciMap:
         self.save_csv()
         self.plot_map(data=self.df, col_to_plot='slots_proportion', **kwargs)
         self.prediction_data(file_name='df_for_map.csv', is_local=False)
-        self.plot_map(data=self.pred, col_to_plot='pred_bike_proportion', img_name='future_map',**kwargs)
+        self.plot_map(data=self.pred, col_to_plot='pred_bike_proportion', img_name='future_map', **kwargs)
         # self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
         self.tweet_map(img=self.base_dir.joinpath('media','map','future_map.png'))

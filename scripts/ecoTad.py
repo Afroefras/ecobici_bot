@@ -31,7 +31,7 @@ def run_ecotad(is_local: bool=False):
     # 2. Filtro de Días a tomar _____________________________________________________________________________
 
     date_max = ecodata['date'].max()
-    date_rest = pd.to_datetime(ecodata['date'].max())-timedelta(4)      # Descomentar estas líneas al llevarlo a git #se elige 2 dias atras para evvitar la prosibilidad media de nulos
+    date_rest = pd.to_datetime(ecodata['date'].max())-timedelta(10)      # Descomentar estas líneas al llevarlo a git #se elige 2 dias atras para evvitar la prosibilidad media de nulos
     date_min = date_rest.strftime("%Y-%m-%d")
     # print(str(date_min),str(date_max))
 

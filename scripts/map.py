@@ -209,6 +209,7 @@ class EcoBiciMap:
         print(self.pred.shape)
         self.pred['prediction'] = self.pred['prediction'].map(lambda x: 0 if x<0 else x)
         self.pred['pred_bike_proportion'] = 1 - self.pred['prediction'] / (self.pred['availability.bikes'] + self.pred['availability.slots'])
+        self.pred['pred_bike_proportion'] = self.pred['pred_bike_proportion'].map(lambda x: 0 if x<0 else x)
 
 
     def get_map(self, img_name: str, shp_first_time: bool=True, **kwargs) -> None:

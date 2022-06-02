@@ -105,7 +105,6 @@ def run_ecotad(is_local: bool=False):
             else:
                 df1 = auxiliarTransponer(data,cicloestacion,i)
                 df = pd.concat([df, df1], ignore_index=True)
-        
         return df
 
     # Ahora aplicamos la funcion a cada cicloestacion, y generamos un dataframe estructurado para cada cicloestacion

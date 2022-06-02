@@ -33,7 +33,7 @@ class EcoBiciMap:
         :secret_id: contraseña propoprcionada por Ecobici, en un correo aparte para mayor seguridad
         '''
         # Obtiene el directorio actual
-        if is_local: self.base_dir = Path('/Users/efraflores/Desktop/hub/ecobici_bot')
+        if is_local: self.base_dir = Path('/Users/efrain.flores/Desktop/hub/ecobici_bot')
         else: self.base_dir = Path().cwd()
         self.csv_dir = self.base_dir.joinpath('data','csv')
         self.shapefile_dir = self.base_dir.joinpath('data','shp')
@@ -208,8 +208,8 @@ class EcoBiciMap:
         self.pred = self.pred.merge(self.av[['id', 'availability.bikes', 'availability.slots']], on='id')
         print(self.pred.shape)
         self.pred['prediction'] = self.pred['prediction'].map(lambda x: 0 if x<0 else x)
-        self.pred['pred_bike_proportion'] = 1 - self.pred['prediction'] / (self.pred['availability.bikes'] + self.pred['availability.slots'])
-        self.pred['pred_bike_proportion'] = self.pred['pred_bike_proportion'].map(lambda x: 0 if x<0 else x)
+        self.pred['bikes_proportion'] = 1 - self.pred['prediction'] / (self.pred['availability.bikes'] + self.pred['availability.slots'])
+        self.pred['bikes_proportion'] = self.pred['bikes_proportion'].map(lambda x: 0 if x<0 else x)
 
 
     def get_map(self, img_name: str, shp_first_time: bool=True, **kwargs) -> None:
@@ -221,7 +221,7 @@ class EcoBiciMap:
         self.transform()
         self.save_csv()
         self.plot_map(data=self.df, col_to_plot='slots_proportion', **kwargs)
-        self.prediction_data(file_name='df_for_map.csv', is_local=self.is_local)
-        self.plot_map(data=self.pred, col_to_plot='pred_bike_proportion', img_name=f'{img_name}', **kwargs)
-        # self.tweet_map(img=self.base_dir.joinpath('media','map','map.png'))
+        try: self.prediction_data(file_name='df_for_map.csv', is_local=self.is_local)
+        except: img_name = 'map'
+        self.plot_map(data=self.pred, col_to_plot='bikes_proportion', img_name=f'{img_name}', **kwargs)
         self.tweet_map(img=self.base_dir.joinpath('media', 'map', f'{img_name}.png'))

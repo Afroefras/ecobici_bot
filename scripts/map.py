@@ -221,7 +221,8 @@ class EcoBiciMap:
         self.transform()
         self.save_csv()
         self.plot_map(data=self.df, col_to_plot='slots_proportion', **kwargs)
-        try: self.prediction_data(file_name='df_for_map.csv', is_local=self.is_local)
+        try: 
+            self.prediction_data(file_name='df_for_map.csv', is_local=self.is_local)
+            self.plot_map(data=self.pred, col_to_plot='bikes_proportion', img_name=f'{img_name}', **kwargs)
         except: img_name = 'map'
-        self.plot_map(data=self.pred, col_to_plot='bikes_proportion', img_name=f'{img_name}', **kwargs)
         self.tweet_map(img=self.base_dir.joinpath('media', 'map', f'{img_name}.png'))

@@ -9,7 +9,7 @@ from requests import get as get_request
 
 # Ingeniería de variables
 from geopandas import read_file
-from pandas import DataFrame, json_normalize, read_csv, concat
+from pandas import DataFrame, Timestamp, json_normalize, read_csv, concat
 
 # Gráficas
 from seaborn import scatterplot
@@ -189,8 +189,9 @@ class EcoBiciMap:
 
 
 
-    def save_csv(self) -> None:
+    def save_csv(self, n_days: int) -> None:
         acum = read_csv(self.csv_dir.joinpath('acum_data.csv'))
+        acum = acum[acum['date'].map(Timestamp) > (datetime.now() - timedelta(days=n_days))].copy()
         try:
             new = self.df.copy()
             new['date'] = str(self.started_at.date())
@@ -212,14 +213,14 @@ class EcoBiciMap:
         self.pred['bikes_proportion'] = self.pred['bikes_proportion'].map(lambda x: 0 if x<0 else x)
 
 
-    def get_map(self, img_name: str, shp_first_time: bool=True, **kwargs) -> None:
+    def get_map(self, img_name: str, n_days: int, shp_first_time: bool=True, **kwargs) -> None:
         self.get_token(first_time=True)
         self.st = self.get_data()
         self.av = self.get_data(availability=True)
         if shp_first_time: self.get_shapefile()
         else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
-        self.save_csv()
+        self.save_csv(n_days=n_days)
         self.plot_map(data=self.df, col_to_plot='slots_proportion', **kwargs)
         try: 
             self.prediction_data(file_name='df_for_map.csv', is_local=self.is_local)

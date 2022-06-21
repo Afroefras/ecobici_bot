@@ -1,13 +1,20 @@
 [![Ecobici bot](https://github.com/Afroefras/ecobici_bot/actions/workflows/run_getmap.yml/badge.svg)](https://github.com/Afroefras/ecobici_bot/actions/workflows/run_getmap.yml)
 
+Colaboración con [@DiegoFores](https://github.com/DiegoFores). Gracias, hermanito!
+
 # ecobici_bot
 Sigue a [@EcobiciMapBot](https://twitter.com/EcobiciMapBot) en Twitter para mostrar disponibilidad de estaciones Ecobici cada 30min 🚴🏽‍♂️
+Lo mejor
  
  
  <br>
 
 
-![Alt text](media/map/map.png?raw=true "Ecobici Map")
+![Current](media/map/map.png?raw=true "Ecobici Map")
+
+Solarized dark             |  Solarized Ocean
+:-------------------------:|:-------------------------:
+![Current](media/map/map.png?raw=true "Ecobici Map")  |  ![Prediction 1 hour ahead](media/map/map.png?raw=true "Ecobici Map")
 
 
 <br>
@@ -35,6 +42,8 @@ Sigue a [@EcobiciMapBot](https://twitter.com/EcobiciMapBot) en Twitter para most
     │
     ├── scripts
     │   ├── __init__.py               # Para que el directorio se trabaje de forma modular
+    │   ├── ecoPredict.py             # 
+    │   ├── ecoTad.py                 # 
     │   ├── map.py                    # Clase con métodos como importar datos desde API, creación de variables, reestructuración de datos, etc
     │   └── run_getmap.py             # Llama a la clase de "map.py" y las credenciales desde GitHub Secrets para correr el proceso
     │

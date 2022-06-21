@@ -4,16 +4,17 @@ Colaboración con [@DiegoFores](https://github.com/DiegoFores). Gracias, hermani
 
 # ecobici_bot
 Sigue a [@EcobiciMapBot](https://twitter.com/EcobiciMapBot) en Twitter para mostrar disponibilidad de estaciones Ecobici cada 30min 🚴🏽‍♂️
-Lo mejor es que presenta la disponibilidad para la siguiente hora, así que seguramente alcanzas tu Ecobici 😉
+
+Lo mejor es que muestra la disponibilidad para la siguiente hora, así que seguramente alcanzas tu Ecobici 😉
  
  
  <br>
 
 Mapa actual            |  Mapa para la siguiente hora
 :-------------------------:|:-------------------------:
-![Current](media/map/map.png?raw=true "Ecobici Map")  |  ![Prediction 1 hour ahead](media/map/future_map.png?raw=true "Ecobici Future Map")
+![](media/map/map.png?raw=true "Ecobici Map")  |  ![](media/map/future_map.png?raw=true "Ecobici Future Map")
 
-* Actualizado al momento, cada 30min que corre el script automáticamente
+*Actualizado al momento, cada 30min que corre el script automáticamente
 
 
 <br>
@@ -41,14 +42,12 @@ Mapa actual            |  Mapa para la siguiente hora
     │
     ├── scripts
     │   ├── __init__.py               # Para que el directorio se trabaje de forma modular
-    │   ├── ecoPredict.py             # 
-    │   ├── ecoTad.py                 # 
+    │   ├── ecoPredict.py             # Recibe los datos transformados desde ecoTad.py para aplicar el modelo de predicción
+    │   ├── ecoTad.py                 # Re-estructura los datos tal que el modelo prediga la demanda futura
     │   ├── map.py                    # Clase con métodos como importar datos desde API, creación de variables, reestructuración de datos, etc
     │   └── run_getmap.py             # Llama a la clase de "map.py" y las credenciales desde GitHub Secrets para correr el proceso
     │
     └── requirements.txt              # Instalar las librerías necesarias con el comando: pip install -r requirements.txt
-    
-    
 
 <br>
 

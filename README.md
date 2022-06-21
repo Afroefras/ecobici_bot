@@ -11,7 +11,7 @@ Lo mejor es que presenta la disponibilidad para la siguiente hora, así que segu
 
 Mapa actual            |  Mapa para la siguiente hora
 :-------------------------:|:-------------------------:
-![Current](media/map/map.png?raw=true "Ecobici Map")  |  ![Prediction 1 hour ahead](media/map/map.png?raw=true "Ecobici Map")
+![Current](media/map/map.png?raw=true "Ecobici Map")  |  ![Prediction 1 hour ahead](media/map/future_map.png?raw=true "Ecobici Future Map")
 
 * Actualizado al momento, cada 30min que corre el script automáticamente
 

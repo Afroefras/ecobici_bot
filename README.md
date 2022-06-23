@@ -1,11 +1,15 @@
 [![Ecobici bot](https://github.com/Afroefras/ecobici_bot/actions/workflows/run_getmap.yml/badge.svg)](https://github.com/Afroefras/ecobici_bot/actions/workflows/run_getmap.yml)
 
-Colaboración con [@DiegoFores](https://github.com/DiegoFores). Gracias, hermanito!
 
-# ecobici_bot
-Sigue a [@EcobiciMapBot](https://twitter.com/EcobiciMapBot) en Twitter para mostrar disponibilidad de estaciones Ecobici cada 30min 🚴🏽‍♂️
+# Ecobici Twitter bot 🚴🏾‍♀️🚴🏾‍♂️
+Sigue a [@EcobiciMapBot](https://twitter.com/EcobiciMapBot) en Twitter para mostrar disponibilidad de estaciones Ecobici CDMX cada 30min
 
 Lo mejor es que muestra la disponibilidad para la siguiente hora, así que seguramente alcanzas tu Ecobici 😉
+
+<br>
+
+Colaboración con [@DiegoFores](https://github.com/DiegoFores). Gracias, hermanito!
+Orientación de [@fferegrino](https://github.com/fferegrino/) a través de un [gran artículo](https://feregri.no/lambda-tweet-parte-1-github-aws-twitter/) (uno de muchos) para crear [@CyclesLondon](https://twitter.com/CyclesLondon) un Twitter bot que actualiza la disponibilidad de la Red de Bicicletas en Londres.
  
  
  <br>
@@ -50,5 +54,18 @@ Mapa actual            |  Mapa para la siguiente hora
     └── requirements.txt              # Instalar las librerías necesarias con el comando: pip install -r requirements.txt
 
 <br>
+
+
+## Consulta desde la API de Ecobici CDMX
+
+1. Es muy fácil hacer uso de la API, el primer paso es registrarte [aquí](https://www.ecobici.cdmx.gob.mx/es/informacion-del-servicio/open-data) para recibir por correo tus credenciales: 
+
+CLIENT_ID y CLIENT_SECRET (guárdalas muy bien, donde nadie las encuentre) 
+([este](https://canovasjm.netlify.app/2021/01/12/github-secrets-from-python-and-r/) artículo me ayudó mucho a entender GitHub Secrets, para guardar y usar credenciales donde ni siquiera tú las consultes)
+
+2. Es posible consultar la información desde tu explorador entrando al siguiente link (con tus credenciales)
+`https://pubsbapi-latam.smartbike.com/oauth/v2/token?client_id={CLIENT_ID}&client_secret={CLIE
+NT_SECRET}&grant_type=client_credentials`
+
 
 ## Work In Progress..

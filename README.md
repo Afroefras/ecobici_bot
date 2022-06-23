@@ -59,11 +59,13 @@ Mapa actual            |  Mapa para la siguiente hora
 
 ## Consulta desde la API de Ecobici CDMX
 
-1. Es muy fácil hacer uso de la API, el primer paso es registrarte [aquí](https://www.ecobici.cdmx.gob.mx/es/informacion-del-servicio/open-data) para recibir por correo tus credenciales: 
+1. El primer paso es registrarte [aquí](https://www.ecobici.cdmx.gob.mx/es/informacion-del-servicio/open-data) para recibir por correo tus credenciales: 
 
-CLIENT_ID y CLIENT_SECRET (guárdalas muy bien, donde nadie las encuentre) 
-([este](https://canovasjm.netlify.app/2021/01/12/github-secrets-from-python-and-r/) artículo me ayudó mucho a entender GitHub Secrets, para guardar y usar credenciales donde ni siquiera tú las consultes)
+CLIENT_ID y CLIENT_SECRET (guárdalas muy bien, donde nadie las encuentre)
 
+([este](https://canovasjm.netlify.app/2021/01/12/github-secrets-from-python-and-r/) artículo me ayudó mucho a entender GitHub Secrets, para guardar y usar credenciales automáticamente)
+
+<br>
 
 2. Instanciar la clase para obtener los datos al momento
 ```python
@@ -75,6 +77,7 @@ ebm = EcoBiciMap(CLIENT_ID, CLIENT_SECRET)
 ebm.get_token(first_time=True)
 ```
 
+<br>
 
 3. Información respecto a las estaciones, incluyendo coordenadas
 ```python
@@ -85,10 +88,18 @@ ebm.get_data()
 |55|55 5 DE MAYO-BOLIVAR|055 - 5 de Mayo - Bolívar|S/N|6700|1|Ampliación Granada|None|[65, 87]|BIKE,TPV|19.434356|-99.138064|
 |124|124 CLAUDIO BERNARD-DR. LICEAGA|124 - Claudio Bernard-Dr. Liceaga|S/N|6500|1|Ampliación Granada|None|[119, 123, 133]|BIKE|19.422392|-99.150358|
 |159|159 HUATABAMPO-EJE 1 PTE. AV. CUAUHTÉMOC|159 - Huatabampo-Eje 1 Pte. Av. Cuauhtémoc|S/N|6760|1|Ampliación Granada|None|[155, 158, 163]|BIKE|19.407517|-99.155373|
-|241|E241 EJERCITO NAL-JUAN VAZQUEZ DE LA MELLA|241 - Ejercito Nacional-Juan Vazquez de la Mella|S/N|11520|1|Ampliación Granada|None|[222, 460]|ELECTRIC_BIKE|19.43862|-99.20758|
-|243|243 MIGUEL DE CERVANTES SAAVEDRA-LAGO FILT|243 - Miguel de Cervantes Saavedra-Lago Filt|S/N|11510|1|Ampliación Granada|None|[199, 242, 244]|BIKE|19.440839|-99.196712|
 
+<br>
 
+4. Disponibilidad de las estaciones (mismo método pero especificando un parámetro)
+```python
+ebm.get_data(availability=True)
+```
+|id|status|availability.bikes|availability.slots|
+|---|---|---|---|
+|55|OPN|13|10|
+|124|OPN|0|21|
+|159|OPN|1|34|![image](https://user-images.githubusercontent.com/66633690/175434205-e8a76f4b-185b-4428-b96a-265788f87279.png)
 
 
 ## Work In Progress..

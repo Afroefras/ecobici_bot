@@ -42,7 +42,8 @@ Mapa actual            |  Mapa para la siguiente hora
     │
     ├── media
     │   └── map
-    │       └── future_map.png        # Imagen del mapa de disponibilidad dentro de una hora, utiliza los datos actuales para predecir
+    │       └── cdmx.png              # Delimitación de códigos postales en CDMX
+    │       └── future_map.png        # Mapa de disponibilidad dentro de una hora, utiliza los datos actuales para predecir
     │       └── map.png               # Imagen del mapa de disponibilidad, se actualiza automáticamente cada 30min
     │
     ├── scripts
@@ -59,13 +60,12 @@ Mapa actual            |  Mapa para la siguiente hora
 
 ## Consulta desde la API de Ecobici CDMX
 
-1. El primer paso es registrarte [aquí](https://www.ecobici.cdmx.gob.mx/es/informacion-del-servicio/open-data) para recibir por correo tus credenciales: 
-
-CLIENT_ID y CLIENT_SECRET (guárdalas muy bien, donde nadie las encuentre)
+1. El primer paso es registrarte [aquí](https://www.ecobici.cdmx.gob.mx/es/informacion-del-servicio/open-data) para recibir por correo tus credenciales: CLIENT_ID y CLIENT_SECRET (guárdalas muy bien, donde nadie las encuentre)
 
 ([este](https://canovasjm.netlify.app/2021/01/12/github-secrets-from-python-and-r/) artículo me ayudó mucho a entender GitHub Secrets, para guardar y usar credenciales automáticamente)
 
-<br>
+<br><br>
+
 
 2. Instanciar la clase para obtener los datos al momento
 ```python
@@ -77,7 +77,8 @@ ebm = EcoBiciMap(CLIENT_ID, CLIENT_SECRET)
 ebm.get_token(first_time=True)
 ```
 
-<br>
+<br><br>
+
 
 3. Información respecto a las estaciones, incluyendo coordenadas
 ```python
@@ -89,7 +90,8 @@ ebm.get_data()
 |124|124 CLAUDIO BERNARD-DR. LICEAGA|124 - Claudio Bernard-Dr. Liceaga|S/N|6500|1|Ampliación Granada|None|[119, 123, 133]|BIKE|19.422392|-99.150358|
 |159|159 HUATABAMPO-EJE 1 PTE. AV. CUAUHTÉMOC|159 - Huatabampo-Eje 1 Pte. Av. Cuauhtémoc|S/N|6760|1|Ampliación Granada|None|[155, 158, 163]|BIKE|19.407517|-99.155373|
 
-<br>
+<br><br>
+
 
 4. Disponibilidad de las estaciones (mismo método pero especificando un parámetro)
 ```python
@@ -99,7 +101,28 @@ ebm.get_data(availability=True)
 |---|---|---|---|
 |55|OPN|13|10|
 |124|OPN|0|21|
-|159|OPN|1|34|![image](https://user-images.githubusercontent.com/66633690/175434205-e8a76f4b-185b-4428-b96a-265788f87279.png)
+|159|OPN|1|34|
+
+<br><br>
+
+
+5. Filtrar las estaciones con estatus activo, unir ambas tablas y calcular la proporción de bicicletas y slots
+```python
+ebm.transform()
+```
+|id|zipCode|location.lat|location.lon|status|availability.bikes|availability.slots|slots_proportion|bikes_proportion|
+|---|---|---|---|---|---|---|---|---|
+|55|6700|19.434356|-99.138064|OPN|11|4|0.27|0.73|
+|124|6500|19.422392|-99.150358|OPN|0|34|1.00|0.00|
+|159|6760|19.407517|-99.155373|OPN|12|24|0.67|0.33|
+
+<br><br>
+
+6. Se utiliza el shapefile de los [Códigos Postales CDMX](https://datos.cdmx.gob.mx/dataset/7abff432-81a0-4956-8691-0865e2722423/resource/8ee17d1b-2d65-4f23-873e-fefc9e418977) para definir los límites en el mapa
+
+CDMX delimitada por zipcodes |
+:-------------------------:|
+![](media/map/cdmx.png?raw=true "Mexico City by zipcodes") |
 
 
 ## Work In Progress..

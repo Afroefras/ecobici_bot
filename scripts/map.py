@@ -25,7 +25,7 @@ from twython import Twython
 import ecoTad, ecoPredict
 
 class EcoBiciMap:
-    def __init__(self, client_id: str, client_secret: str, twitter_key: str, twitter_secret: str, access_token: str, access_secret: str, is_local: bool=True) -> None:
+    def __init__(self, client_id: str, client_secret: str, twitter_key: str='', twitter_secret: str='', access_token: str='', access_secret: str='', is_local: bool=True) -> None:
         '''
         Define el directorio base, la URL base y las credenciales para el acceso a la API Ecobici
 

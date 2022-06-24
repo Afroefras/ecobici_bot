@@ -119,6 +119,10 @@ ebm.transform()
 <br><br>
 
 6. Se utiliza el shapefile de los [Códigos Postales CDMX](https://datos.cdmx.gob.mx/dataset/7abff432-81a0-4956-8691-0865e2722423/resource/8ee17d1b-2d65-4f23-873e-fefc9e418977) para definir los límites en el mapa
-![](media/map/cdmx.png?raw=true "Mexico City by zipcodes")
+
+CDMX delimitada por zipcodes |
+:-------------------------:|
+![](media/map/cdmx.png?raw=true "Mexico City by zipcodes") |
+
 
 ## Work In Progress..

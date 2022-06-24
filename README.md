@@ -138,4 +138,13 @@ ebm.plot_map(
 ```
 ![](media/map/map.png?raw=true "Ecobici Map")
 
-## Work In Progress..
+<br><br>
+
+
+8. Crear el tweet de dicho mapa, o bien, el que pronostica la demanda de la siguiente hora
+```python
+ebm.tweet_map(img='~/map.png')
+```
+Quieres comprobarlo? Cada 30min se actualiza en **[@EcobiciMapBot](https://twitter.com/EcobiciMapBot)** ⬅️ Te reto a seguirnos!
+
+

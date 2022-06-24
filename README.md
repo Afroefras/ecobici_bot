@@ -2,7 +2,8 @@
 
 
 # Ecobici Twitter bot 🚴🏾‍♀️🚴🏾‍♂️
-Sigue a [@EcobiciMapBot](https://twitter.com/EcobiciMapBot) en Twitter para mostrar disponibilidad de estaciones Ecobici CDMX cada 30min
+**Sigue a [@EcobiciMapBot](https://twitter.com/EcobiciMapBot) en Twitter para ver la disponibilidad de bicicletas en CDMX cada 30min**
+
 
 Lo mejor es que muestra la disponibilidad para la siguiente hora, así que seguramente alcanzas tu Ecobici 😉
 
@@ -58,9 +59,9 @@ Mapa actual            |  Mapa para la siguiente hora
 <br>
 
 
-## Consulta desde la API de Ecobici CDMX
+## ¿Cómo mostramos un mapa en Twitter?
 
-1. El primer paso es registrarte [aquí](https://www.ecobici.cdmx.gob.mx/es/informacion-del-servicio/open-data) para recibir por correo tus credenciales: CLIENT_ID y CLIENT_SECRET (guárdalas muy bien, donde nadie las encuentre)
+1. El primer paso es registrarte para la API [aquí](https://www.ecobici.cdmx.gob.mx/es/informacion-del-servicio/open-data), recibirás un correo con tus credenciales: CLIENT_ID y CLIENT_SECRET (guárdalas muy bien, donde nadie las encuentre)
 
 ([este](https://canovasjm.netlify.app/2021/01/12/github-secrets-from-python-and-r/) artículo me ayudó mucho a entender GitHub Secrets, para guardar y usar credenciales automáticamente)
 
@@ -120,9 +121,21 @@ ebm.transform()
 
 6. Se utiliza el shapefile de los [Códigos Postales CDMX](https://datos.cdmx.gob.mx/dataset/7abff432-81a0-4956-8691-0865e2722423/resource/8ee17d1b-2d65-4f23-873e-fefc9e418977) para definir los límites en el mapa
 
-CDMX delimitada por zipcodes |
-:-------------------------:|
-![](media/map/cdmx.png?raw=true "Mexico City by zipcodes") |
+![](media/map/cdmx.png?raw=true "Mexico City by zipcodes") 
 
+<br><br>
+
+
+7. Unir ambos mapas, utilizando las coordenadas y disponibilidad de las estaciones
+```python
+ebm.plot_map(
+    data=ebm.df,
+    col_to_plot='slots_proportion',
+    padding=0.006,
+    color='#ffffff',
+    edgecolor='#00acee', 
+    points_palette='Blues')
+```
+![](media/map/map.png?raw=true "Ecobici Map")
 
 ## Work In Progress..

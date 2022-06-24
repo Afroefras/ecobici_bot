@@ -63,7 +63,7 @@ Mapa actual            |  Mapa para la siguiente hora
 
 1. El primer paso es registrarte para la API [aquí](https://www.ecobici.cdmx.gob.mx/es/informacion-del-servicio/open-data), recibirás un correo con tus credenciales: CLIENT_ID y CLIENT_SECRET (guárdalas muy bien, donde nadie las encuentre)
 
-([este](https://canovasjm.netlify.app/2021/01/12/github-secrets-from-python-and-r/) artículo me ayudó mucho a entender GitHub Secrets, para guardar y usar credenciales automáticamente)
+([este artículo](https://canovasjm.netlify.app/2021/01/12/github-secrets-from-python-and-r/) me ayudó mucho a entender GitHub Secrets, para guardar y usar credenciales automáticamente mediante un workflow .yml)
 
 <br><br>
 

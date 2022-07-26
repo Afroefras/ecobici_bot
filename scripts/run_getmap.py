@@ -18,7 +18,6 @@ if __name__ == "__main__":
         n_days=27,
         shp_first_time=False, 
         padding=0.006,
-        # color='#1B1B1B',
         color='#ffffff',
         edgecolor='#00acee', 
         points_palette='Blues'

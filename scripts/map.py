@@ -173,7 +173,7 @@ class EcoBiciMap:
         scatterplot(y=lat_col, x=lon_col, data=data, ax=ax, palette=cmap, hue=col_to_plot)
 
         # Modifica las etiquetas para indicar el significado del color en las estaciones
-        self.set_custom_legend(ax, cmap, values=[(0.0, 'Hay bicis'), (0.5, 'Puede haber'), (1.0, 'No hay bicis')])
+        self.set_custom_legend(ax, cmap, values=[(0.0, 'Sin bicis'), (0.5, 'Algunas bicis'), (1.0, 'Mucha bici')])
         # Guarda la imagen
         self.eb_map[img_name] = fig
         self.eb_map[img_name].savefig(self.base_dir.joinpath('media','map',f'{img_name}.png'))
@@ -221,7 +221,7 @@ class EcoBiciMap:
         else: self.gdf = read_file(self.shapefile_dir).to_crs(epsg=4326)
         self.transform()
         self.save_csv(n_days=n_days)
-        self.plot_map(data=self.df, col_to_plot='slots_proportion', **kwargs)
+        self.plot_map(data=self.df, col_to_plot='bikes_proportion', **kwargs)
         try: 
             self.prediction_data(file_name='df_for_map.csv', is_local=self.is_local)
             self.plot_map(data=self.pred, col_to_plot='bikes_proportion', img_name=f'{img_name}', **kwargs)

@@ -16,9 +16,8 @@ Orientación de [@fferegrino](https://github.com/fferegrino/) a través de un [g
  
  <br>
 
-Mapa actual            |  Mapa para la siguiente hora
-:-------------------------:|:-------------------------:
-![](media/map/map.png?raw=true "Ecobici Map")  |  ![](media/map/future_map.png?raw=true "Ecobici Future Map")
+Mapa actual
+![](media/map/map.png?raw=true "Ecobici Map")
 
 *Actualizado al momento, cada 30min que corre el script automáticamente
 
